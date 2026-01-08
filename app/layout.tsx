@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,6 +10,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
 });
 
@@ -25,8 +31,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
       >
+        <header className="w-full py-4 bg-white shadow-[0_1px_0_0_var(--green-teal)] flex items-center justify-center">
+          <Link
+            href="/"
+            className="text-xl font-bold text-[var(--green-teal)] hover:opacity-80 transition-opacity"
+            style={{ fontFamily: 'var(--font-montserrat)' }}
+          >
+            SWStarter
+          </Link>
+        </header>
         {children}
       </body>
     </html>
