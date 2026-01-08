@@ -11,12 +11,9 @@ export default function Home() {
     e.preventDefault();
     
     try {
-      let results;
-      if (searchType === 'movies') {
-        results = await fetchFilms();
-      } else {
-        results = await fetchPeople();
-      }
+      const results = searchType === 'movies' 
+        ? await fetchFilms(searchTerm)
+        : await fetchPeople(searchTerm);
       
       console.log('Search results:', results);
     } catch (error) {

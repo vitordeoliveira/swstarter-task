@@ -1,6 +1,6 @@
 'use server';
 
-export async function fetchFilms() {
+export async function fetchFilms(searchTerm?: string) {
   try {
     const response = await fetch('https://swapi.tech/api/films', {
       cache: 'no-store',
@@ -11,14 +11,22 @@ export async function fetchFilms() {
     }
     
     const data = await response.json();
-    return data.result;
+    const films = data.result;
+    
+    if (!searchTerm || searchTerm.trim() === '') {
+      return films;
+    }
+    
+    return films.filter((film: any) =>
+      film.properties.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   } catch (error) {
     console.error('Error fetching films:', error);
     throw error;
   }
 }
 
-export async function fetchPeople() {
+export async function fetchPeople(searchTerm?: string) {
   try {
     const response = await fetch('https://swapi.tech/api/people', {
       cache: 'no-store',
@@ -29,7 +37,15 @@ export async function fetchPeople() {
     }
     
     const data = await response.json();
-    return data.results;
+    const people = data.results;
+    
+    if (!searchTerm || searchTerm.trim() === '') {
+      return people;
+    }
+    
+    return people.filter((person: any) =>
+      person.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   } catch (error) {
     console.error('Error fetching people:', error);
     throw error;
