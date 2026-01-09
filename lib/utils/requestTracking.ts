@@ -93,3 +93,36 @@ export async function getAllRequests() {
   }
 }
 
+export async function getMostPopularHourOfDay(): Promise<{ hour: number; count: number } | null> {
+  try {
+    const db = getDrizzle();
+    
+    const allRequests = await db
+      .select({
+        timestamp: requestTimings.timestamp,
+      })
+      .from(requestTimings);
+    
+    const hourCounts: Record<number, number> = {};
+    
+    allRequests.forEach((row) => {
+      const date = new Date(row.timestamp);
+      const hour = date.getUTCHours();
+      hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+    });
+    
+    if (Object.keys(hourCounts).length === 0) {
+      return null;
+    }
+    
+    const sortedHours = Object.entries(hourCounts)
+      .map(([hour, count]) => ({ hour: Number(hour), count }))
+      .sort((a, b) => b.count - a.count);
+    
+    return sortedHours[0];
+  } catch (error) {
+    console.error('Error getting most popular hour:', error);
+    return null;
+  }
+}
+

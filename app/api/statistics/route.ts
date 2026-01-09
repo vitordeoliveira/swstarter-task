@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
-import { getAllAverages, getAllRequests } from '@/lib/utils/requestTracking';
+import { getAllAverages, getMostPopularHourOfDay } from '@/lib/utils/requestTracking';
 
 export async function GET() {
   try {
-    const [averages, requests] = await Promise.all([
+    const [averages, mostPopularHour] = await Promise.all([
       getAllAverages(),
-      getAllRequests(),
+      getMostPopularHourOfDay(),
     ]);
 
     return NextResponse.json({
       unit: 'milliseconds',
+      timezone: 'UTC',
       averages,
-      requests,
+      mostPopularHourOfDay: mostPopularHour,
     });
   } catch (error) {
     console.error('Error fetching statistics:', error);
