@@ -9,3 +9,8 @@ export const requestTimings = sqliteTable('request_timings', {
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });
 
+export const hourlyStatistics = sqliteTable('hourly_statistics', {
+  hour: integer('hour').primaryKey(),
+  count: integer('count').notNull().default(0),
+});
+

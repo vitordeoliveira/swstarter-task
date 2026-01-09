@@ -1,6 +1,23 @@
 import { getDrizzle } from '../db';
-import { requestTimings } from '../schema';
+import { requestTimings, hourlyStatistics } from '../schema';
 import { sql, eq, avg, desc } from 'drizzle-orm';
+
+async function updateHourlyStatistics(timestamp: Date): Promise<void> {
+  try {
+    const db = getDrizzle();
+    const hour = timestamp.getUTCHours();
+    
+    await db
+      .insert(hourlyStatistics)
+      .values({ hour, count: 1 })
+      .onConflictDoUpdate({
+        target: hourlyStatistics.hour,
+        set: { count: sql`${hourlyStatistics.count} + 1` },
+      });
+  } catch (error) {
+    console.error('Error updating hourly statistics:', error);
+  }
+}
 
 export async function trackRequestTiming(
   url: string,
@@ -10,12 +27,18 @@ export async function trackRequestTiming(
 ): Promise<void> {
   try {
     const db = getDrizzle();
+    const timestamp = new Date();
+    
     await db.insert(requestTimings).values({
       url,
       method,
       duration,
       statusCode,
-      timestamp: new Date(),
+      timestamp,
+    });
+    
+    updateHourlyStatistics(timestamp).catch((error) => {
+      console.error('Error updating hourly statistics asynchronously:', error);
     });
   } catch (error) {
     console.error('Error tracking request timing:', error);
@@ -97,29 +120,20 @@ export async function getMostPopularHourOfDay(): Promise<{ hour: number; count: 
   try {
     const db = getDrizzle();
     
-    const allRequests = await db
-      .select({
-        timestamp: requestTimings.timestamp,
-      })
-      .from(requestTimings);
+    const result = await db
+      .select()
+      .from(hourlyStatistics)
+      .orderBy(desc(hourlyStatistics.count))
+      .limit(1);
     
-    const hourCounts: Record<number, number> = {};
-    
-    allRequests.forEach((row) => {
-      const date = new Date(row.timestamp);
-      const hour = date.getUTCHours();
-      hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-    });
-    
-    if (Object.keys(hourCounts).length === 0) {
+    if (result.length === 0) {
       return null;
     }
     
-    const sortedHours = Object.entries(hourCounts)
-      .map(([hour, count]) => ({ hour: Number(hour), count }))
-      .sort((a, b) => b.count - a.count);
-    
-    return sortedHours[0];
+    return {
+      hour: result[0].hour,
+      count: result[0].count,
+    };
   } catch (error) {
     console.error('Error getting most popular hour:', error);
     return null;
