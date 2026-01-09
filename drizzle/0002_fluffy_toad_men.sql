@@ -1,0 +1,1 @@
+ALTER TABLE `request_timings` DROP COLUMN `cached`;

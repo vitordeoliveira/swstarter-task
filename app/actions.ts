@@ -8,28 +8,8 @@ import { MovieWithPeople } from './types/movieWithPeople';
 import { getMoviesFromUrls, getPeopleFromUrls, PersonWithId } from './utils/urlHelpers';
 import { trackRequestTiming } from '@/lib/utils/requestTracking';
 
-async function trackedFetch(url: string, options?: RequestInit, cached?: boolean): Promise<Response> {
-  const startTime = Date.now();
-  const method = options?.method || 'GET';
-  
-  try {
-    const response = await fetch(url, options);
-    const duration = Date.now() - startTime;
-    
-    const isCached = cached ?? (response.headers.get('x-cache') === 'HIT' || duration < 10);
-    
-    await trackRequestTiming(url, method, duration, response.status, isCached);
-    
-    return response;
-  } catch (error) {
-    const duration = Date.now() - startTime;
-    await trackRequestTiming(url, method, duration, undefined, cached ?? false);
-    throw error;
-  }
-}
-
 const cachedFetchFilms = cache(async (): Promise<Movie[]> => {
-  const response = await trackedFetch('https://swapi.tech/api/films', {
+  const response = await fetch('https://swapi.tech/api/films', {
     next: { revalidate: 3600 },
   });
   
@@ -42,24 +22,34 @@ const cachedFetchFilms = cache(async (): Promise<Movie[]> => {
 });
 
 export async function fetchFilms(searchTerm?: string): Promise<Movie[]> {
+  const startTime = Date.now();
+  
   try {
     const films = await cachedFetchFilms();
     
+    let result: Movie[];
     if (!searchTerm || searchTerm.trim() === '') {
-      return films;
+      result = films;
+    } else {
+      result = films.filter((film) =>
+        film.properties.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
     
-    return films.filter((film) =>
-      film.properties.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const duration = Date.now() - startTime;
+    await trackRequestTiming('fetchFilms', 'GET', duration, 200);
+    
+    return result;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    await trackRequestTiming('fetchFilms', 'GET', duration);
     console.error('Error fetching films:', error);
     throw error;
   }
 }
 
 const cachedFetchPeople = cache(async (): Promise<Person[]> => {
-  const response = await trackedFetch('https://swapi.tech/api/people', {
+  const response = await fetch('https://swapi.tech/api/people', {
     next: { revalidate: 3600 },
   });
   
@@ -72,24 +62,34 @@ const cachedFetchPeople = cache(async (): Promise<Person[]> => {
 });
 
 export async function fetchPeople(searchTerm?: string): Promise<Person[]> {
+  const startTime = Date.now();
+  
   try {
     const people = await cachedFetchPeople();
     
+    let result: Person[];
     if (!searchTerm || searchTerm.trim() === '') {
-      return people;
+      result = people;
+    } else {
+      result = people.filter((person) =>
+        person.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
     
-    return people.filter((person) =>
-      person.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const duration = Date.now() - startTime;
+    await trackRequestTiming('fetchPeople', 'GET', duration, 200);
+    
+    return result;
   } catch (error) {
+    const duration = Date.now() - startTime;
+    await trackRequestTiming('fetchPeople', 'GET', duration);
     console.error('Error fetching people:', error);
     throw error;
   }
 }
 
 const cachedFetchPersonDetails = cache(async (id: string) => {
-  const response = await trackedFetch(`https://swapi.tech/api/people/${id}`, {
+  const response = await fetch(`https://swapi.tech/api/people/${id}`, {
     next: { revalidate: 3600 },
   });
   

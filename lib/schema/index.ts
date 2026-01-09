@@ -6,7 +6,6 @@ export const requestTimings = sqliteTable('request_timings', {
   method: text('method').notNull().default('GET'),
   duration: integer('duration').notNull(),
   statusCode: integer('status_code'),
-  cached: integer('cached', { mode: 'boolean' }).notNull().default(false),
   timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
 });
 

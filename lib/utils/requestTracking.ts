@@ -6,8 +6,7 @@ export async function trackRequestTiming(
   url: string,
   method: string,
   duration: number,
-  statusCode?: number,
-  cached?: boolean
+  statusCode?: number
 ): Promise<void> {
   try {
     const db = getDrizzle();
@@ -16,7 +15,6 @@ export async function trackRequestTiming(
       method,
       duration,
       statusCode,
-      cached: cached ?? false,
       timestamp: new Date(),
     });
   } catch (error) {

@@ -15,6 +15,13 @@
       "when": 1767989086148,
       "tag": "0001_military_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1767989943397,
+      "tag": "0002_fluffy_toad_men",
+      "breakpoints": true
     }
   ]
 }
