@@ -1,15 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchFilms, fetchPeople } from './actions';
 import Button from './components/Button';
+import { Person } from './types/person';
+import { Movie } from './types/movie';
 
 export default function Home() {
   const [searchType, setSearchType] = useState<'people' | 'movies'>('people');
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<any[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [peopleData, setPeopleData] = useState<Person[]>([]);
+  const [moviesData, setMoviesData] = useState<Movie[]>([]);
+  const [placeholder, setPlaceholder] = useState<string>('e.g. Luke Skywalker, C-3P0, R2-D2');
+
+  useEffect(() => {
+    async function loadInitialData() {
+      try {
+        const [people, movies] = await Promise.all([
+          fetchPeople(),
+          fetchFilms(),
+        ]);
+        setPeopleData(people);
+        setMoviesData(movies);
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      }
+    }
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    if (searchType === 'people' && peopleData.length > 0) {
+      const examples = peopleData.slice(0, 3).map(p => p.name).join(', ');
+      setPlaceholder(`e.g. ${examples}`);
+    } else if (searchType === 'movies' && moviesData.length > 0) {
+      const examples = moviesData.slice(0, 3).map(m => m.properties.title).join(', ');
+      setPlaceholder(`e.g. ${examples}`);
+    }
+  }, [searchType, peopleData, moviesData]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +98,7 @@ export default function Home() {
           <div className="flex flex-col gap-4">
             <input
               type="text"
-              placeholder="e.g. Chewbacca, Yoda, Boba Fett"
+              placeholder={placeholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[var(--green-teal)] text-base text-black placeholder:font-bold placeholder:text-base placeholder:text-[#c4c4c4]"
