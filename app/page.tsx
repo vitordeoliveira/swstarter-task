@@ -7,14 +7,39 @@ import Button from './components/Button';
 import { Person } from './types/person';
 import { Movie } from './types/movie';
 
+const STORAGE_KEY = 'swstarter-last-search';
+
+type SearchResult = Person | Movie;
+
+interface LastSearch {
+  searchType: 'people' | 'movies';
+  searchTerm: string;
+  results: SearchResult[];
+}
+
 export default function Home() {
   const [searchType, setSearchType] = useState<'people' | 'movies'>('people');
   const [searchTerm, setSearchTerm] = useState('');
-  const [results, setResults] = useState<any[] | null>(null);
+  const [results, setResults] = useState<SearchResult[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [peopleData, setPeopleData] = useState<Person[]>([]);
   const [moviesData, setMoviesData] = useState<Movie[]>([]);
   const [placeholder, setPlaceholder] = useState<string>('e.g. Luke Skywalker, C-3P0, R2-D2');
+
+  // Load last search from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedSearch = localStorage.getItem(STORAGE_KEY);
+      if (savedSearch) {
+        const lastSearch: LastSearch = JSON.parse(savedSearch);
+        setSearchType(lastSearch.searchType);
+        setSearchTerm(lastSearch.searchTerm);
+        setResults(lastSearch.results);
+      }
+    } catch (error) {
+      console.error('Error loading saved search:', error);
+    }
+  }, []);
 
   useEffect(() => {
     async function loadInitialData() {
@@ -52,6 +77,15 @@ export default function Home() {
         : await fetchPeople(searchTerm);
       
       setResults(searchResults);
+      
+      // Save search to localStorage
+      const lastSearch: LastSearch = {
+        searchType,
+        searchTerm,
+        results: searchResults,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lastSearch));
+      
       console.log('Search results:', searchResults);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -77,7 +111,18 @@ export default function Home() {
                 name="searchType" 
                 value="people" 
                 checked={searchType === 'people'}
-                onChange={(e) => setSearchType(e.target.value as 'people' | 'movies')}
+                onChange={(e) => {
+                  const newType = e.target.value as 'people' | 'movies';
+                  setSearchType(newType);
+                  if (results !== null) {
+                    const lastSearch: LastSearch = {
+                      searchType: newType,
+                      searchTerm,
+                      results: results || [],
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(lastSearch));
+                  }
+                }}
                 className="cursor-pointer" 
               />
               <span className="text-sm font-bold text-gray-700">People</span>
@@ -88,7 +133,18 @@ export default function Home() {
                 name="searchType" 
                 value="movies" 
                 checked={searchType === 'movies'}
-                onChange={(e) => setSearchType(e.target.value as 'people' | 'movies')}
+                onChange={(e) => {
+                  const newType = e.target.value as 'people' | 'movies';
+                  setSearchType(newType);
+                  if (results !== null) {
+                    const lastSearch: LastSearch = {
+                      searchType: newType,
+                      searchTerm,
+                      results: results || [],
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(lastSearch));
+                  }
+                }}
                 className="cursor-pointer" 
               />
               <span className="text-sm font-bold text-gray-700">Movies</span>
@@ -140,24 +196,31 @@ export default function Home() {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto">
-              {results.map((item: any, index: number) => (
-                <div key={index}>
-                  <div className="flex items-center justify-between gap-4 mb-2">
-                    <h4 className="text-base font-semibold text-gray-800">
-                      {searchType === 'movies' ? item.properties?.title : item.name}
-                    </h4>
-                    <Link href={`/details/${searchType === 'movies' ? 'movies' : 'people'}/${item.uid || item._id || index}`}>
-                      <Button
-                        type="button"
-                        className="flex-shrink-0"
-                      >
-                        See Details
-                      </Button>
-                    </Link>
+              {results.map((item: SearchResult, index: number) => {
+                const isMovie = searchType === 'movies' && 'properties' in item;
+                const isPerson = searchType === 'people' && 'name' in item;
+                const title = isMovie ? item.properties.title : isPerson ? item.name : '';
+                const id = item.uid || item._id || String(index);
+                
+                return (
+                  <div key={index}>
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <h4 className="text-base font-semibold text-gray-800">
+                        {title}
+                      </h4>
+                      <Link href={`/details/${searchType === 'movies' ? 'movies' : 'people'}/${id}`}>
+                        <Button
+                          type="button"
+                          className="flex-shrink-0"
+                        >
+                          See Details
+                        </Button>
+                      </Link>
+                    </div>
+                    <hr className="my-2 border-gray-300" />
                   </div>
-                  <hr className="my-2 border-gray-300" />
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
