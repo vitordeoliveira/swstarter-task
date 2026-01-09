@@ -6,9 +6,30 @@ import { Person } from './types/person';
 import { PersonWithMovies } from './types/personWithMovies';
 import { MovieWithPeople } from './types/movieWithPeople';
 import { getMoviesFromUrls, getPeopleFromUrls, PersonWithId } from './utils/urlHelpers';
+import { trackRequestTiming } from '@/lib/utils/requestTracking';
+
+async function trackedFetch(url: string, options?: RequestInit, cached?: boolean): Promise<Response> {
+  const startTime = Date.now();
+  const method = options?.method || 'GET';
+  
+  try {
+    const response = await fetch(url, options);
+    const duration = Date.now() - startTime;
+    
+    const isCached = cached ?? (response.headers.get('x-cache') === 'HIT' || duration < 10);
+    
+    await trackRequestTiming(url, method, duration, response.status, isCached);
+    
+    return response;
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    await trackRequestTiming(url, method, duration, undefined, cached ?? false);
+    throw error;
+  }
+}
 
 const cachedFetchFilms = cache(async (): Promise<Movie[]> => {
-  const response = await fetch('https://swapi.tech/api/films', {
+  const response = await trackedFetch('https://swapi.tech/api/films', {
     next: { revalidate: 3600 },
   });
   
@@ -38,7 +59,7 @@ export async function fetchFilms(searchTerm?: string): Promise<Movie[]> {
 }
 
 const cachedFetchPeople = cache(async (): Promise<Person[]> => {
-  const response = await fetch('https://swapi.tech/api/people', {
+  const response = await trackedFetch('https://swapi.tech/api/people', {
     next: { revalidate: 3600 },
   });
   
@@ -68,7 +89,7 @@ export async function fetchPeople(searchTerm?: string): Promise<Person[]> {
 }
 
 const cachedFetchPersonDetails = cache(async (id: string) => {
-  const response = await fetch(`https://swapi.tech/api/people/${id}`, {
+  const response = await trackedFetch(`https://swapi.tech/api/people/${id}`, {
     next: { revalidate: 3600 },
   });
   
