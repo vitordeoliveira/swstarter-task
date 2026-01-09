@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { fetchFilms, fetchPeople } from './actions';
 import Button from './components/Button';
 
@@ -116,12 +117,14 @@ export default function Home() {
                     <h4 className="text-base font-semibold text-gray-800">
                       {searchType === 'movies' ? item.properties?.title : item.name}
                     </h4>
-                    <Button
-                      type="button"
-                      className="flex-shrink-0"
-                    >
-                      See Details
-                    </Button>
+                    <Link href={`/details/${searchType === 'movies' ? 'movies' : 'people'}/${item.uid || item._id || index}`}>
+                      <Button
+                        type="button"
+                        className="flex-shrink-0"
+                      >
+                        See Details
+                      </Button>
+                    </Link>
                   </div>
                   <hr className="my-2 border-gray-300" />
                 </div>

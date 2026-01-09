@@ -52,3 +52,57 @@ export async function fetchPeople(searchTerm?: string) {
   }
 }
 
+export async function fetchPersonDetails(id: string) {
+  try {
+    const response = await fetch(`https://swapi.tech/api/people/${id}`, {
+      cache: 'no-store',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch person details');
+    }
+    
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching person details:', error);
+    throw error;
+  }
+}
+
+export async function fetchFilmDetails(url: string) {
+  try {
+    const response = await fetch(url, {
+      cache: 'no-store',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch film details');
+    }
+    
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching film details:', error);
+    throw error;
+  }
+}
+
+export async function fetchFilmDetailsById(id: string) {
+  try {
+    const response = await fetch(`https://swapi.tech/api/films/${id}`, {
+      cache: 'no-store',
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch film details');
+    }
+    
+    const data = await response.json();
+    return data.result;
+  } catch (error) {
+    console.error('Error fetching film details:', error);
+    throw error;
+  }
+}
+
