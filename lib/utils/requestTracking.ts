@@ -1,6 +1,6 @@
 import { getDrizzle } from '../db';
 import { requestTimings } from '../schema';
-import { sql, eq, avg } from 'drizzle-orm';
+import { sql, eq, avg, desc } from 'drizzle-orm';
 
 export async function trackRequestTiming(
   url: string,
@@ -41,6 +41,55 @@ export async function getAverageRequestTiming(url?: string): Promise<number | nu
   } catch (error) {
     console.error('Error getting average request timing:', error);
     return null;
+  }
+}
+
+export async function getAllAverages(): Promise<Record<string, number>> {
+  try {
+    const db = getDrizzle();
+    
+    const result = await db
+      .select({
+        url: requestTimings.url,
+        average: avg(requestTimings.duration),
+      })
+      .from(requestTimings)
+      .groupBy(requestTimings.url);
+    
+    const averages: Record<string, number> = {};
+    result.forEach((row) => {
+      if (row.average) {
+        averages[row.url] = Number(row.average);
+      }
+    });
+    
+    return averages;
+  } catch (error) {
+    console.error('Error getting all averages:', error);
+    return {};
+  }
+}
+
+export async function getAllRequests() {
+  try {
+    const db = getDrizzle();
+    
+    const result = await db
+      .select()
+      .from(requestTimings)
+      .orderBy(desc(requestTimings.timestamp));
+    
+    return result.map((row) => ({
+      id: row.id,
+      url: row.url,
+      method: row.method,
+      durationMs: row.duration,
+      statusCode: row.statusCode,
+      timestamp: row.timestamp,
+    }));
+  } catch (error) {
+    console.error('Error getting all requests:', error);
+    return [];
   }
 }
 
