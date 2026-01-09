@@ -17,6 +17,19 @@ interface LastSearch {
   results: SearchResult[];
 }
 
+function isMovie(item: SearchResult): item is Movie {
+  return 'properties' in item && 
+         item.properties !== undefined && 
+         item.properties !== null &&
+         typeof item.properties === 'object' && 
+         'title' in item.properties &&
+         typeof (item.properties as { title?: unknown }).title === 'string';
+}
+
+function isPerson(item: SearchResult): item is Person {
+  return 'name' in item && typeof item.name === 'string';
+}
+
 export default function Home() {
   const [searchType, setSearchType] = useState<'people' | 'movies'>('people');
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +39,6 @@ export default function Home() {
   const [moviesData, setMoviesData] = useState<Movie[]>([]);
   const [placeholder, setPlaceholder] = useState<string>('e.g. Luke Skywalker, C-3P0, R2-D2');
 
-  // Load last search from localStorage on mount
   useEffect(() => {
     try {
       const savedSearch = localStorage.getItem(STORAGE_KEY);
@@ -78,7 +90,6 @@ export default function Home() {
       
       setResults(searchResults);
       
-      // Save search to localStorage
       const lastSearch: LastSearch = {
         searchType,
         searchTerm,
@@ -197,9 +208,11 @@ export default function Home() {
           ) : (
             <div className="flex-1 overflow-y-auto">
               {results.map((item: SearchResult, index: number) => {
-                const isMovie = searchType === 'movies' && 'properties' in item;
-                const isPerson = searchType === 'people' && 'name' in item;
-                const title = isMovie ? item.properties.title : isPerson ? item.name : '';
+                const title = isMovie(item) 
+                  ? item.properties.title 
+                  : isPerson(item) 
+                    ? item.name 
+                    : '';
                 const id = item.uid || item._id || String(index);
                 
                 return (

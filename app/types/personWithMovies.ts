@@ -10,7 +10,7 @@ export interface PersonWithMovies {
     height?: string;
     mass?: string;
     films?: string[];
-    [key: string]: any;
+    [key: string]: unknown;
   };
   _id: string;
   uid: string;
