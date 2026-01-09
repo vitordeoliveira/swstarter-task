@@ -1,23 +1,34 @@
 'use server';
 
-export async function fetchFilms(searchTerm?: string) {
+import { cache } from 'react';
+import { Movie } from './types/movie';
+import { Person } from './types/person';
+import { PersonWithMovies } from './types/personWithMovies';
+import { MovieWithPeople } from './types/movieWithPeople';
+import { getMoviesFromUrls, getPeopleFromUrls, PersonWithId } from './utils/urlHelpers';
+
+const cachedFetchFilms = cache(async (): Promise<Movie[]> => {
+  const response = await fetch('https://swapi.tech/api/films', {
+    next: { revalidate: 3600 },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch films');
+  }
+  
+  const data = await response.json() as { result: Movie[] };
+  return data.result;
+});
+
+export async function fetchFilms(searchTerm?: string): Promise<Movie[]> {
   try {
-    const response = await fetch('https://swapi.tech/api/films', {
-      cache: 'no-store',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch films');
-    }
-    
-    const data = await response.json();
-    const films = data.result;
+    const films = await cachedFetchFilms();
     
     if (!searchTerm || searchTerm.trim() === '') {
       return films;
     }
     
-    return films.filter((film: any) =>
+    return films.filter((film) =>
       film.properties.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
   } catch (error) {
@@ -26,24 +37,28 @@ export async function fetchFilms(searchTerm?: string) {
   }
 }
 
-export async function fetchPeople(searchTerm?: string) {
+const cachedFetchPeople = cache(async (): Promise<Person[]> => {
+  const response = await fetch('https://swapi.tech/api/people', {
+    next: { revalidate: 3600 },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch people');
+  }
+  
+  const data = await response.json() as { results: Person[] };
+  return data.results;
+});
+
+export async function fetchPeople(searchTerm?: string): Promise<Person[]> {
   try {
-    const response = await fetch('https://swapi.tech/api/people', {
-      cache: 'no-store',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch people');
-    }
-    
-    const data = await response.json();
-    const people = data.results;
+    const people = await cachedFetchPeople();
     
     if (!searchTerm || searchTerm.trim() === '') {
       return people;
     }
     
-    return people.filter((person: any) =>
+    return people.filter((person) =>
       person.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   } catch (error) {
@@ -52,57 +67,62 @@ export async function fetchPeople(searchTerm?: string) {
   }
 }
 
-export async function fetchPersonDetails(id: string) {
+const cachedFetchPersonDetails = cache(async (id: string) => {
+  const response = await fetch(`https://swapi.tech/api/people/${id}`, {
+    next: { revalidate: 3600 },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch person details');
+  }
+  
+  const data = await response.json();
+  return data.result;
+});
+
+export async function fetchPersonDetails(id: string): Promise<PersonWithMovies | null> {
   try {
-    const response = await fetch(`https://swapi.tech/api/people/${id}`, {
-      cache: 'no-store',
-    });
+    const personData = await cachedFetchPersonDetails(id);
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch person details');
+    let movies: Movie[] = [];
+    if (personData?.properties?.films && Array.isArray(personData.properties.films)) {
+      const allFilms = await fetchFilms();
+      movies = getMoviesFromUrls(personData.properties.films, allFilms);
     }
     
-    const data = await response.json();
-    return data.result;
+    return {
+      ...personData,
+      movies,
+    } as PersonWithMovies;
   } catch (error) {
     console.error('Error fetching person details:', error);
-    throw error;
+    return null;
   }
 }
 
-export async function fetchFilmDetails(url: string) {
+export async function fetchFilmDetails(id: string): Promise<MovieWithPeople | null> {
   try {
-    const response = await fetch(url, {
-      cache: 'no-store',
-    });
+    const films = await fetchFilms();
+    const film = films.find((film) => film.uid === id || film._id === id);
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch film details');
+    if (!film) {
+      return null;
     }
     
-    const data = await response.json();
-    return data.result;
+    let people: PersonWithId[] = [];
+    if (film.properties.characters && Array.isArray(film.properties.characters)) {
+      const allPeople = await fetchPeople();
+      people = getPeopleFromUrls(film.properties.characters, allPeople);
+    }
+    
+    return {
+      ...film,
+      people,
+    };
   } catch (error) {
     console.error('Error fetching film details:', error);
-    throw error;
+    return null;
   }
 }
 
-export async function fetchFilmDetailsById(id: string) {
-  try {
-    const response = await fetch(`https://swapi.tech/api/films/${id}`, {
-      cache: 'no-store',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch film details');
-    }
-    
-    const data = await response.json();
-    return data.result;
-  } catch (error) {
-    console.error('Error fetching film details:', error);
-    throw error;
-  }
-}
 

@@ -3,18 +3,19 @@
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Button from '@/app/components/Button';
-import { fetchFilmDetailsById } from '@/app/actions';
+import { fetchFilmDetails } from '@/app/actions';
+import { MovieWithPeople } from '@/app/types/movieWithPeople';
 
 export default function MoviesDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const [film, setFilm] = useState<any>(null);
+  const [film, setFilm] = useState<MovieWithPeople | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadFilmDetails() {
       try {
         setIsLoading(true);
-        const filmData = await fetchFilmDetailsById(id);
+        const filmData = await fetchFilmDetails(id);
         setFilm(filmData);
       } catch (error) {
         console.error('Error loading film details:', error);
@@ -60,7 +61,6 @@ export default function MoviesDetailsPage({ params }: { params: Promise<{ id: st
           <h1 className="text-lg font-bold text-gray-800 mb-6">{properties.title}</h1>
           
           <div className="flex gap-6 mb-6">
-            {/* Left side - Opening Crawl */}
             <div className="flex-1">
               <h2 className="text-base font-semibold text-gray-800 mb-2">Opening Crawl</h2>
               <hr className="my-2 border-gray-300 mb-4" />
@@ -69,12 +69,25 @@ export default function MoviesDetailsPage({ params }: { params: Promise<{ id: st
               </p>
             </div>
             
-            {/* Right side - Characters */}
             <div className="flex-1">
               <h2 className="text-base font-semibold text-gray-800 mb-2">Characters</h2>
               <hr className="my-2 border-gray-300 mb-4" />
               <p className="text-sm text-gray-700">
-                No characters found
+                {film.people && film.people.length > 0 ? (
+                  film.people.map((person, index) => (
+                    <span key={person.id}>
+                      <Link 
+                        href={`/details/people/${person.id}`}
+                        className="text-[var(--green-teal)] hover:underline"
+                      >
+                        {person.name}
+                      </Link>
+                      {index < film.people.length - 1 && ', '}
+                    </span>
+                  ))
+                ) : (
+                  'No characters found'
+                )}
               </p>
             </div>
           </div>

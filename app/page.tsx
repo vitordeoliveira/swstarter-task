@@ -33,7 +33,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-12">
       <div className="flex items-start gap-8 max-w-6xl w-full px-4">
-        {/* Left Box - maintaining 205:115 proportion */}
         <form 
           onSubmit={handleSearch}
           className="w-[410px] h-[230px] p-8 rounded-lg shadow-lg bg-white flex-shrink-0 flex flex-col gap-4"
@@ -84,7 +83,6 @@ export default function Home() {
           </div>
         </form>
         
-        {/* Right Box */}
         <div className="w-[40rem] h-[40rem] p-8 rounded-lg shadow-lg bg-white flex-shrink-0 flex flex-col">
           <h3 className="text-lg font-bold text-gray-800">Results</h3>
           <hr className="my-2 border-gray-300" />
