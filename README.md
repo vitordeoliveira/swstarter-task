@@ -45,8 +45,7 @@ In a real production environment, you typically don't need to pre-compute statis
 - Real-world scenarios where on-demand computation is acceptable
 
 ### Solution 2: Test Requirement Implementation
-
-**Location:** `solution_2/`
+**Location:** `solution_with_queues/`
 
 **Philosophy:** Implements the exact requirement from the test specification.
 
