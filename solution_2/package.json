@@ -10,14 +10,12 @@
     "worker": "tsx worker.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "better-sqlite3": "^12.5.0",
     "bullmq": "^5.40.0",
     "drizzle-orm": "^0.45.1",
-    "ioredis": "^5.4.1",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
