@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getAllAverages, getMostPopularHourOfDay } from '@/lib/utils/requestTracking';
 
+const statisticsUrls = [
+  '/api/statistics/requests',
+  "/api/statistics",
+];
 export async function GET() {
   try {
     const [averages, mostPopularHour] = await Promise.all([
@@ -13,6 +17,7 @@ export async function GET() {
       timezone: 'UTC',
       averages,
       mostPopularHourOfDay: mostPopularHour,
+      urls: statisticsUrls,
     });
   } catch (error) {
     console.error('Error fetching statistics:', error);

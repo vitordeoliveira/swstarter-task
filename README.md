@@ -19,7 +19,7 @@ The task requirements specified that statistics **must be re-computed every 5 mi
 
 ### Solution 1: Production-Ready Approach
 
-**Location:** `solution_1/`
+**Location:** `solution_without_queues/`
 
 **Philosophy:** A practical, efficient solution optimized for real-world deployment.
 
