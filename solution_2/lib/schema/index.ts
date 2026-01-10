@@ -14,3 +14,9 @@ export const hourlyStatistics = sqliteTable('hourly_statistics', {
   count: integer('count').notNull().default(0),
 });
 
+export const computedStatistics = sqliteTable('computed_statistics', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  data: text('data').notNull(), // JSON string of statistics
+  computedAt: integer('computed_at', { mode: 'timestamp' }).notNull(),
+});
+
