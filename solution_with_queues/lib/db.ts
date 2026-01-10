@@ -8,7 +8,7 @@ let db: Database.Database | null = null;
 let drizzleDb: ReturnType<typeof drizzle> | null = null;
 
 function getDatabasePath(): string {
-  const dataDir = join(process.cwd(), 'data');
+  const dataDir = process.env.DATA_DIR || join(process.cwd(), 'data');
   
   if (!existsSync(dataDir)) {
     mkdirSync(dataDir, { recursive: true });
