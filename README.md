@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SW Starter Task
 
-## Getting Started
+A Next.js application built with TypeScript, Drizzle ORM, and SQLite.
 
-First, run the development server:
+## Prerequisites
+
+### For Local Development
+- **Node.js** (version 18 or higher)
+- **pnpm** (version 10.24.0 or higher)
+  - Install globally: `npm install -g pnpm@10.24.0`
+
+### For Docker
+- **Docker** (latest version)
+- **Docker Compose** (optional, if using docker-compose)
+
+## Running Locally
+
+### 1. Install Dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Set Up Database
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create the database directory and run migrations:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+mkdir -p data
+pnpm db:migrate
+```
 
-## Learn More
+### 3. Start Development Server
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Build for Production (Optional)
 
-## Deploy on Vercel
+```bash
+pnpm build
+pnpm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Running with Docker
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Option 1: Using Docker Build and Run
+
+1. **Build the Docker image:**
+
+```bash
+docker build -t swstarter-task .
+```
+
+2. **Run the container:**
+
+```bash
+docker run -p 3000:3000 swstarter-task
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
+
+### Option 2: Using Docker Compose
+
+Simply run:
+
+```bash
+docker-compose up --build
+```
+
+Or to run in detached mode:
+
+```bash
+docker-compose up -d --build
+```
+
+To stop the container:
+
+```bash
+docker-compose down
+```
+
+The `docker-compose.yml` file includes:
+- Automatic build from the Dockerfile
+- Port mapping (3000:3000)
+- Volume mount for the database directory (persists data between restarts)
+- Automatic restart policy
+
+## Available Scripts
+
+- `pnpm dev` - Start the development server
+- `pnpm build` - Build the application for production
+- `pnpm start` - Start the production server
+- `pnpm lint` - Run ESLint
+- `pnpm db:generate` - Generate database migrations
+- `pnpm db:migrate` - Run database migrations
+- `pnpm db:push` - Push schema changes to database
+- `pnpm db:studio` - Open Drizzle Studio (database GUI)
+
+## Database
+
+The application uses SQLite with Drizzle ORM. The database file is stored in the `data/database.db` directory.
+
+### Database Management
+
+- **View database:** Run `pnpm db:studio` to open Drizzle Studio in your browser
+- **Create migrations:** After schema changes, run `pnpm db:generate`
+- **Apply migrations:** Run `pnpm db:migrate` to apply pending migrations
+
+## Project Structure
+
+```
+swstarter-task/
+├── app/              # Next.js app directory
+├── data/             # Database files
+├── drizzle/          # Database migrations
+├── lib/              # Utility functions and database setup
+├── public/           # Static assets
+├── Dockerfile        # Docker configuration
+└── docker-compose.yml # Docker Compose configuration
+```
+
+## Notes
+
+- The database directory (`data/`) is excluded from Docker builds via `.dockerignore`
+- The Dockerfile installs pnpm globally and runs migrations during the build process
+- Port 3000 is exposed by default
