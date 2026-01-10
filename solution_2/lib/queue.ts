@@ -18,6 +18,7 @@ function getQueue() {
   queueInstance.on('error', (error) => {
     console.error('❌ Queue error: make sure Redis is running');
     console.error('Current redis url: ', redisUrl);
+    console.error('You can change the redis url setting the REDIS_URL environment variable');
   });
 
   return queueInstance;
