@@ -1,6 +1,3 @@
-PRAGMA journal_mode = WAL;
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE `request_timings` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`url` text NOT NULL,
