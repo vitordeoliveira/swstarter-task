@@ -14,6 +14,12 @@ function getQueue() {
       },
     });
   }
+
+  queueInstance.on('error', (error) => {
+    console.error('❌ Queue error: make sure Redis is running');
+    console.error('Current redis url: ', redisUrl);
+  });
+
   return queueInstance;
 }
 
