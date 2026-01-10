@@ -167,7 +167,14 @@ export default function Home() {
               type="text"
               placeholder={placeholder}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                setSearchTerm(newValue);
+                if (!newValue.trim()) {
+                  localStorage.removeItem(STORAGE_KEY);
+                  setResults(null);
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[var(--green-teal)] text-base text-black placeholder:font-bold placeholder:text-base placeholder:text-[#c4c4c4]"
               style={{ fontFamily: 'var(--font-montserrat)' }}
             />
