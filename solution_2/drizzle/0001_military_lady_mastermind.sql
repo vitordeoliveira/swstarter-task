@@ -1,0 +1,1 @@
+ALTER TABLE `request_timings` ADD `cached` integer DEFAULT false NOT NULL;
