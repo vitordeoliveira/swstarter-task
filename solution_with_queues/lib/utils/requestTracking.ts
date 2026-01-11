@@ -1,6 +1,6 @@
 import { getDrizzle } from '../db';
-import { requestTimings, hourlyStatistics } from '../schema';
-import { sql, eq, avg, desc } from 'drizzle-orm';
+import { requestTimings, hourlyStatistics, searchQueries } from '../schema';
+import { sql, eq, avg, desc, count } from 'drizzle-orm';
 
 async function updateHourlyStatistics(timestamp: Date): Promise<void> {
   try {
@@ -137,6 +137,72 @@ export async function getMostPopularHourOfDay(): Promise<{ hour: number; count: 
   } catch (error) {
     console.error('Error getting most popular hour:', error);
     return null;
+  }
+}
+
+export async function trackSearchQuery(
+  query: string,
+  searchType: 'people' | 'movies'
+): Promise<void> {
+  try {
+    // Only track non-empty queries
+    if (!query || query.trim() === '') {
+      return;
+    }
+
+    const db = getDrizzle();
+    const timestamp = new Date();
+    
+    await db.insert(searchQueries).values({
+      query: query.trim().toLowerCase(),
+      searchType,
+      timestamp,
+    });
+  } catch (error) {
+    console.error('Error tracking search query:', error);
+  }
+}
+
+export interface TopQuery {
+  query: string;
+  count: number;
+  percentage: number;
+}
+
+export async function getTopFiveQueriesWithPercentages(): Promise<TopQuery[]> {
+  try {
+    const db = getDrizzle();
+    
+    // Get total count of all queries
+    const totalResult = await db
+      .select({ total: count() })
+      .from(searchQueries);
+    
+    const totalQueries = totalResult[0]?.total || 0;
+    
+    if (totalQueries === 0) {
+      return [];
+    }
+    
+    // Get top 5 queries by count
+    const topQueriesResult = await db
+      .select({
+        query: searchQueries.query,
+        count: count(),
+      })
+      .from(searchQueries)
+      .groupBy(searchQueries.query)
+      .orderBy(desc(count()))
+      .limit(5);
+    
+    return topQueriesResult.map((row) => ({
+      query: row.query,
+      count: row.count,
+      percentage: Number(((row.count / totalQueries) * 100).toFixed(2)),
+    }));
+  } catch (error) {
+    console.error('Error getting top five queries:', error);
+    return [];
   }
 }
 
