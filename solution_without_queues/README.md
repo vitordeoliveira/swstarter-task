@@ -2,6 +2,11 @@
 
 A Next.js application built with TypeScript, Drizzle ORM, and SQLite.
 
+## Documentation
+
+- [README.md](./README.md) - This file (setup and usage guide)
+- [DECISIONS.md](./DECISIONS.md) - Architecture and design decisions
+
 ## Prerequisites
 
 ### For Local Development
@@ -11,7 +16,35 @@ A Next.js application built with TypeScript, Drizzle ORM, and SQLite.
 
 ### For Docker
 - **Docker** (latest version)
-- **Docker Compose** (optional, if using docker-compose)
+- **Docker Compose** (recommended)
+
+## Running with Docker Compose (Recommended)
+
+The easiest way to get started is using Docker Compose, which sets up everything automatically:
+
+```bash
+docker-compose up --build
+```
+
+Or to run in detached mode:
+
+```bash
+docker-compose up -d --build
+```
+
+To stop the containers:
+
+```bash
+docker-compose down
+```
+
+The `docker-compose.yml` file includes:
+- Automatic build from the Dockerfile
+- Port mapping (3000:3000)
+- Volume mount for the database directory (persists data between restarts)
+- Automatic restart policy
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
 ## Running Locally
 
@@ -45,9 +78,9 @@ pnpm build
 pnpm start
 ```
 
-## Running with Docker
+## Running with Docker (Alternative)
 
-### Option 1: Using Docker Build and Run
+If you prefer to use Docker without Docker Compose:
 
 1. **Build the Docker image:**
 
@@ -62,32 +95,6 @@ docker run -p 3000:3000 swstarter-task
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
-
-### Option 2: Using Docker Compose
-
-Simply run:
-
-```bash
-docker-compose up --build
-```
-
-Or to run in detached mode:
-
-```bash
-docker-compose up -d --build
-```
-
-To stop the container:
-
-```bash
-docker-compose down
-```
-
-The `docker-compose.yml` file includes:
-- Automatic build from the Dockerfile
-- Port mapping (3000:3000)
-- Volume mount for the database directory (persists data between restarts)
-- Automatic restart policy
 
 ## Available Scripts
 

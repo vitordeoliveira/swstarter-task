@@ -13,4 +13,3 @@ export const hourlyStatistics = sqliteTable('hourly_statistics', {
   hour: integer('hour').primaryKey(),
   count: integer('count').notNull().default(0),
 });
-

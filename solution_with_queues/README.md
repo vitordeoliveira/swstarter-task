@@ -4,6 +4,11 @@ A Next.js application built with TypeScript, Drizzle ORM, SQLite, BullMQ, and Re
 
 This solution implements an event-driven architecture with a message queue system that automatically recomputes statistics every 5 minutes.
 
+## Documentation
+
+- [README.md](./README.md) - This file (setup and usage guide)
+- [DECISIONS.md](./DECISIONS.md) - Architecture and design decisions
+
 ## Prerequisites
 
 ### For Local Development
@@ -18,6 +23,39 @@ This solution implements an event-driven architecture with a message queue syste
 ### For Docker
 - **Docker** (latest version)
 - **Docker Compose** (recommended, includes Redis)
+
+## Running with Docker Compose (Recommended)
+
+The easiest way to get started is using Docker Compose, which sets up everything automatically:
+
+```bash
+docker-compose up --build
+```
+
+Or to run in detached mode:
+
+```bash
+docker-compose up -d --build
+```
+
+To stop the containers:
+
+```bash
+docker-compose down
+```
+
+The `docker-compose.yml` file includes:
+- **Redis service** - Message queue backend for BullMQ
+- **App service** - Next.js application
+- **Worker service** - BullMQ worker process (runs statistics computation jobs)
+- Automatic build from the Dockerfile
+- Port mapping (3000:3000 for app, 6379:6379 for Redis)
+- Volume mount for the database directory (persists data between restarts)
+- Automatic restart policy
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
+
+**Note:** All services (app, worker, and Redis) run automatically with Docker Compose.
 
 ## Running Locally
 
@@ -78,9 +116,9 @@ pnpm build
 pnpm start
 ```
 
-## Running with Docker
+## Running with Docker (Alternative)
 
-### Option 1: Using Docker Build and Run
+If you prefer to use Docker without Docker Compose:
 
 1. **Build the Docker image:**
 
@@ -94,40 +132,7 @@ docker build -t swstarter-task .
 docker run -p 3000:3000 swstarter-task
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000).
-
-### Option 2: Using Docker Compose
-
-Simply run:
-
-```bash
-docker-compose up --build
-```
-
-Or to run in detached mode:
-
-```bash
-docker-compose up -d --build
-```
-
-To stop the container:
-
-```bash
-docker-compose down
-```
-
-The `docker-compose.yml` file includes:
-- **Redis service** - Message queue backend for BullMQ
-- **App service** - Next.js application
-- Automatic build from the Dockerfile
-- Port mapping (3000:3000 for app, 6379:6379 for Redis)
-- Volume mount for the database directory (persists data between restarts)
-- Automatic restart policy
-
-**Note:** When using Docker Compose, you'll still need to run the worker process separately. The worker can be run:
-- Inside a separate container (add to docker-compose.yml)
-- On the host machine (connecting to the Redis container)
-- As a separate process in the same container (not recommended for production)
+**Note:** With this approach, you'll need to run Redis separately and the worker process separately.
 
 ## Available Scripts
 
