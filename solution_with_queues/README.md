@@ -206,6 +206,7 @@ swstarter-task/
 ## Environment Variables
 
 - `REDIS_URL` - Redis connection URL (default: `redis://localhost:6379`)
+- `JOB_INTERVAL_MINUTES` - Interval in minutes for statistics computation job (default: `5`)
 - `NODE_ENV` - Set to `production` for production mode
 
 ## Notes
@@ -215,5 +216,5 @@ swstarter-task/
 - Port 3000 is exposed by default for the Next.js app
 - Port 6379 is exposed by default for Redis (when using Docker Compose)
 - The worker process must be running separately from the Next.js app
-- Statistics are automatically recomputed every 5 minutes via the BullMQ queue
+- Statistics are automatically recomputed at the interval specified by `JOB_INTERVAL_MINUTES` (default: 5 minutes) via the BullMQ queue
 - The API endpoint returns pre-computed statistics for fast responses

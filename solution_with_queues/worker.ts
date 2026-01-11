@@ -2,7 +2,7 @@
 
 import { Worker } from 'bullmq';
 import { computeAndStoreStatistics } from './lib/statistics-computation';
-import { STATISTICS_JOB_NAME, QUEUE_NAME, REDIS_URL_DEFAULT, JOB_INTERVAL_MS, JOB_CLEANUP } from './lib/constants';
+import { STATISTICS_JOB_NAME, QUEUE_NAME, REDIS_URL_DEFAULT, JOB_INTERVAL_MS, JOB_CLEANUP, JOB_INTERVAL_MINUTES } from './lib/constants';
 
 const redisUrl = process.env.REDIS_URL || REDIS_URL_DEFAULT;
 
@@ -80,6 +80,7 @@ worker.on('error', (err) => {
 
 console.log('🚀 Statistics computation worker started');
 console.log(`📡 Connecting to Redis: ${redisUrl}`);
+console.log(`⏰ Job interval: ${JOB_INTERVAL_MINUTES} minute${JOB_INTERVAL_MINUTES !== 1 ? 's' : ''}`);
 console.log(`⏰ Next run scheduled at: ${formatNextRunTime()}\n`);
 
 const shutdown = async () => {

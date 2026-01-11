@@ -23,6 +23,7 @@ services:
       - redis
     environment:
       - REDIS_URL=redis://redis:6379
+      - JOB_INTERVAL_MINUTES=5
 
   worker:
     build:
@@ -35,6 +36,7 @@ services:
       - redis
     environment:
       - REDIS_URL=redis://redis:6379
+      - JOB_INTERVAL_MINUTES=5
     command: pnpm worker
 
 volumes:

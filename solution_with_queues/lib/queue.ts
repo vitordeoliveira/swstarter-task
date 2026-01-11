@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import { QUEUE_NAME, STATISTICS_JOB_NAME, REDIS_URL_DEFAULT, JOB_CRON_PATTERN, JOB_CLEANUP } from './constants';
+import { QUEUE_NAME, STATISTICS_JOB_NAME, REDIS_URL_DEFAULT, JOB_CRON_PATTERN, JOB_CLEANUP, JOB_INTERVAL_MINUTES } from './constants';
 
 const redisUrl = process.env.REDIS_URL || REDIS_URL_DEFAULT;
 
@@ -41,7 +41,7 @@ export async function registerStatisticsJob() {
       }
     );
 
-    console.log('✅ Statistics computation job registered (runs every 5 minutes)');
+    console.log(`✅ Statistics computation job registered (runs every ${JOB_INTERVAL_MINUTES} minute${JOB_INTERVAL_MINUTES === 1 ? '' : 's'})`);
   } catch (error) {
     console.error('❌ Error registering statistics job:', error);
     throw error;
