@@ -24,6 +24,19 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379
+    command: pnpm worker
+
 volumes:
   redis-data:
 
