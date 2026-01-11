@@ -13,3 +13,10 @@ export const hourlyStatistics = sqliteTable('hourly_statistics', {
   hour: integer('hour').primaryKey(),
   count: integer('count').notNull().default(0),
 });
+
+export const searchQueries = sqliteTable('search_queries', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  query: text('query').notNull(),
+  searchType: text('search_type').notNull(), // 'people' or 'movies'
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
+});

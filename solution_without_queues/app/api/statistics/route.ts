@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllAverages, getMostPopularHourOfDay } from '@/lib/utils/requestTracking';
+import { getAllAverages, getMostPopularHourOfDay, getTopFiveQueriesWithPercentages } from '@/lib/utils/requestTracking';
 
 const statisticsUrls = [
   '/api/statistics/requests',
@@ -7,9 +7,10 @@ const statisticsUrls = [
 ];
 export async function GET() {
   try {
-    const [averages, mostPopularHour] = await Promise.all([
+    const [averages, mostPopularHour, topFiveQueries] = await Promise.all([
       getAllAverages(),
       getMostPopularHourOfDay(),
+      getTopFiveQueriesWithPercentages(),
     ]);
 
     return NextResponse.json({
@@ -17,6 +18,7 @@ export async function GET() {
       timezone: 'UTC',
       averages,
       mostPopularHourOfDay: mostPopularHour,
+      topFiveQueries,
       urls: statisticsUrls,
     });
   } catch (error) {
