@@ -1,6 +1,6 @@
 import { getDrizzle } from './db';
 import { computedStatistics } from './schema';
-import { getAllAverages, getMostPopularHourOfDay } from './utils/requestTracking';
+import { getAllAverages, getMostPopularHourOfDay, getTopFiveQueriesWithPercentages, TopQuery } from './utils/requestTracking';
 import { sql } from 'drizzle-orm';
 
 export interface StatisticsData {
@@ -8,13 +8,15 @@ export interface StatisticsData {
   timezone: string;
   averages: Record<string, number>;
   mostPopularHourOfDay: { hour: number; count: number } | null;
+  topFiveQueries: TopQuery[];
 }
 
 export async function computeAndStoreStatistics(): Promise<StatisticsData> {
   try {
-    const [averages, mostPopularHour] = await Promise.all([
+    const [averages, mostPopularHour, topFiveQueries] = await Promise.all([
       getAllAverages(),
       getMostPopularHourOfDay(),
+      getTopFiveQueriesWithPercentages(),
     ]);
 
     const statistics: StatisticsData = {
@@ -22,6 +24,7 @@ export async function computeAndStoreStatistics(): Promise<StatisticsData> {
       timezone: 'UTC',
       averages,
       mostPopularHourOfDay: mostPopularHour,
+      topFiveQueries,
     };
 
     const db = getDrizzle();
@@ -37,6 +40,7 @@ export async function computeAndStoreStatistics(): Promise<StatisticsData> {
     console.log('✅ Statistics computed and stored:', {
       urlCount: Object.keys(averages).length,
       mostPopularHour: mostPopularHour?.hour ?? null,
+      topQueriesCount: topFiveQueries.length,
       computedAt: computedAt.toISOString(),
     });
 

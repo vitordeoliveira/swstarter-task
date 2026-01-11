@@ -20,3 +20,10 @@ export const computedStatistics = sqliteTable('computed_statistics', {
   computedAt: integer('computed_at', { mode: 'timestamp' }).notNull(),
 });
 
+export const searchQueries = sqliteTable('search_queries', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  query: text('query').notNull(),
+  searchType: text('search_type').notNull(), // 'people' or 'movies'
+  timestamp: integer('timestamp', { mode: 'timestamp' }).notNull(),
+});
+

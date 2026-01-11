@@ -6,7 +6,7 @@ import { Person } from './types/person';
 import { PersonWithMovies } from './types/personWithMovies';
 import { MovieWithPeople } from './types/movieWithPeople';
 import { getMoviesFromUrls, getPeopleFromUrls, PersonWithId } from './utils/urlHelpers';
-import { trackRequestTiming } from '@/lib/utils/requestTracking';
+import { trackRequestTiming, trackSearchQuery } from '@/lib/utils/requestTracking';
 
 const cachedFetchFilms = cache(async (): Promise<Movie[]> => {
   const response = await fetch('https://swapi.tech/api/films', {
@@ -34,6 +34,7 @@ export async function fetchFilms(searchTerm?: string): Promise<Movie[]> {
       result = films.filter((film) =>
         film.properties.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
+      await trackSearchQuery(searchTerm, 'movies');
     }
     
     const duration = Date.now() - startTime;
@@ -74,6 +75,7 @@ export async function fetchPeople(searchTerm?: string): Promise<Person[]> {
       result = people.filter((person) =>
         person.name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
+      await trackSearchQuery(searchTerm, 'people');
     }
     
     const duration = Date.now() - startTime;

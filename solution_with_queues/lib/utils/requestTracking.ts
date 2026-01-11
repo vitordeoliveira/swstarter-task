@@ -173,7 +173,6 @@ export async function getTopFiveQueriesWithPercentages(): Promise<TopQuery[]> {
   try {
     const db = getDrizzle();
     
-    // Get total count of all queries
     const totalResult = await db
       .select({ total: count() })
       .from(searchQueries);
@@ -184,7 +183,6 @@ export async function getTopFiveQueriesWithPercentages(): Promise<TopQuery[]> {
       return [];
     }
     
-    // Get top 5 queries by count
     const topQueriesResult = await db
       .select({
         query: searchQueries.query,

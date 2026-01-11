@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCachedStatistics } from '@/lib/statistics-computation';
-import { getAllAverages, getMostPopularHourOfDay } from '@/lib/utils/requestTracking';
+import { getAllAverages, getMostPopularHourOfDay, getTopFiveQueriesWithPercentages } from '@/lib/utils/requestTracking';
 
 const statisticsUrls = [
   '/api/statistics/requests',
@@ -16,9 +16,10 @@ export async function GET() {
     }
 
     console.warn('No cached statistics found, computing on-demand');
-    const [averages, mostPopularHour] = await Promise.all([
+    const [averages, mostPopularHour, topFiveQueries] = await Promise.all([
       getAllAverages(),
       getMostPopularHourOfDay(),
+      getTopFiveQueriesWithPercentages(),
     ]);
 
     return NextResponse.json({
@@ -26,6 +27,7 @@ export async function GET() {
       timezone: 'UTC',
       averages,
       mostPopularHourOfDay: mostPopularHour,
+      topFiveQueries,
       urls: statisticsUrls,
     });
   } catch (error) {
