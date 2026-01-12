@@ -17,8 +17,8 @@ const cachedFetchFilms = cache(async (): Promise<Movie[]> => {
     throw new Error('Failed to fetch films');
   }
   
-  const data = await response.json() as { result: Movie[] };
-  return data.result;
+  const data = await response.json() as { result: Omit<Movie, 'type'>[] };
+  return data.result.map((film) => ({ ...film, type: 'movie' as const } as Movie));
 });
 
 export async function fetchFilms(searchTerm?: string): Promise<Movie[]> {
@@ -58,8 +58,8 @@ const cachedFetchPeople = cache(async (): Promise<Person[]> => {
     throw new Error('Failed to fetch people');
   }
   
-  const data = await response.json() as { results: Person[] };
-  return data.results;
+  const data = await response.json() as { results: Omit<Person, 'type'>[] };
+  return data.results.map((person) => ({ ...person, type: 'person' as const } as Person));
 });
 
 export async function fetchPeople(searchTerm?: string): Promise<Person[]> {
@@ -115,6 +115,7 @@ export async function fetchPersonDetails(id: string): Promise<PersonWithMovies |
     
     return {
       ...personData,
+      type: 'person' as const,
       movies,
     } as PersonWithMovies;
   } catch (error) {

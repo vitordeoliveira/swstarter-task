@@ -23,16 +23,11 @@ interface SearchPageProps {
 }
 
 function isMovie(item: SearchResult): item is Movie {
-  return 'properties' in item && 
-         item.properties !== undefined && 
-         item.properties !== null &&
-         typeof item.properties === 'object' && 
-         'title' in item.properties &&
-         typeof (item.properties as { title?: unknown }).title === 'string';
+  return item.type === 'movie';
 }
 
 function isPerson(item: SearchResult): item is Person {
-  return 'name' in item && typeof item.name === 'string';
+  return item.type === 'person';
 }
 
 export default function SearchPage({ initialPeople, initialMovies }: SearchPageProps) {

@@ -5,6 +5,7 @@ export interface MovieProperties {
 }
 
 export interface Movie {
+  type: 'movie';
   properties: MovieProperties;
   _id: string;
   uid: string;
