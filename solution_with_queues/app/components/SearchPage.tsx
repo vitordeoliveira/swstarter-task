@@ -96,11 +96,11 @@ export default function SearchPage({ initialPeople, initialMovies }: SearchPageP
   };
 
   return (
-    <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-12">
-      <div className="flex items-start gap-8 max-w-6xl w-full px-4">
+    <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-6 sm:pt-12 pb-6">
+      <div className="flex flex-col lg:flex-row items-start gap-4 sm:gap-6 lg:gap-8 w-full max-w-[90rem] px-4">
         <form 
           onSubmit={handleSearch}
-          className="w-[410px] h-[230px] p-8 rounded-lg shadow-lg bg-white flex-shrink-0 flex flex-col gap-4"
+          className="w-full lg:w-[28%] xl:w-[32%] 2xl:w-[410px] min-h-[230px] p-6 sm:p-8 rounded-lg shadow-lg bg-white flex-shrink-0 flex flex-col gap-4"
         >
           <h2 className="text-base font-semibold text-gray-800">What are you searching for?</h2>
           
@@ -177,7 +177,7 @@ export default function SearchPage({ initialPeople, initialMovies }: SearchPageP
           </div>
         </form>
         
-        <div className="w-[40rem] h-[40rem] p-8 rounded-lg shadow-lg bg-white flex-shrink-0 flex flex-col">
+        <div className="w-full lg:w-[68%] xl:w-[64%] 2xl:w-[40rem] h-[400px] sm:h-[500px] lg:h-[40rem] p-6 sm:p-8 rounded-lg shadow-lg bg-white flex-shrink-0 flex flex-col">
           <h3 className="text-lg font-bold text-gray-800">Results</h3>
           <hr className="my-2 border-gray-300" />
           
@@ -213,14 +213,14 @@ export default function SearchPage({ initialPeople, initialMovies }: SearchPageP
                 
                 return (
                   <div key={index}>
-                    <div className="flex items-center justify-between gap-4 mb-2">
-                      <h4 className="text-base font-semibold text-gray-800">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-2">
+                      <h4 className="text-sm sm:text-base font-semibold text-gray-800 break-words flex-1">
                         {title}
                       </h4>
-                      <Link href={`/details/${searchType === 'movies' ? 'movies' : 'people'}/${id}`}>
+                      <Link href={`/details/${searchType === 'movies' ? 'movies' : 'people'}/${id}`} className="flex-shrink-0 w-full sm:w-auto">
                         <Button
                           type="button"
-                          className="flex-shrink-0"
+                          className="w-full sm:w-auto"
                         >
                           See Details
                         </Button>

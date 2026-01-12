@@ -11,9 +11,9 @@ interface MovieDetailsProps {
 export default function MovieDetails({ film }: MovieDetailsProps) {
   if (!film) {
     return (
-      <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-12">
+      <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-6 sm:pt-12 pb-6">
         <div className="max-w-4xl w-full px-4">
-          <div className="p-8 rounded-lg shadow-lg bg-white">
+          <div className="p-6 sm:p-8 rounded-lg shadow-lg bg-white">
             <p className="text-center text-gray-600">Film not found</p>
           </div>
         </div>
@@ -24,24 +24,24 @@ export default function MovieDetails({ film }: MovieDetailsProps) {
   const properties = film.properties || {};
 
   return (
-    <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-12">
+    <div className="min-h-screen bg-[#ededed] flex items-start justify-center pt-6 sm:pt-12 pb-6">
       <div className="max-w-4xl w-full px-4">
-        <div className="p-8 rounded-lg shadow-lg bg-white">
-          <h1 className="text-lg font-bold text-gray-800 mb-6">{properties.title}</h1>
+        <div className="p-6 sm:p-8 rounded-lg shadow-lg bg-white">
+          <h1 className="text-base sm:text-lg font-bold text-gray-800 mb-4 sm:mb-6 break-words">{properties.title}</h1>
           
-          <div className="flex gap-6 mb-6">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
             <div className="flex-1">
-              <h2 className="text-base font-semibold text-gray-800 mb-2">Opening Crawl</h2>
+              <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2">Opening Crawl</h2>
               <hr className="my-2 border-gray-300 mb-4" />
-              <p className="text-sm text-gray-700 whitespace-pre-line">
+              <p className="text-sm text-gray-700 whitespace-pre-line break-words">
                 {properties.opening_crawl || 'N/A'}
               </p>
             </div>
             
             <div className="flex-1">
-              <h2 className="text-base font-semibold text-gray-800 mb-2">Characters</h2>
+              <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-2">Characters</h2>
               <hr className="my-2 border-gray-300 mb-4" />
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 break-words">
                 {film.people && film.people.length > 0 ? (
                   film.people.map((person, index) => (
                     <span key={person.id}>
