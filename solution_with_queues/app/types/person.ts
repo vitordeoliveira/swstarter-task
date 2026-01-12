@@ -1,4 +1,5 @@
 export interface Person {
+  type: 'person';
   name: string;
   uid?: string;
   _id?: string;

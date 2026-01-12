@@ -23,16 +23,11 @@ interface SearchPageProps {
 }
 
 function isMovie(item: SearchResult): item is Movie {
-  return 'properties' in item && 
-         item.properties !== undefined && 
-         item.properties !== null &&
-         typeof item.properties === 'object' && 
-         'title' in item.properties &&
-         typeof (item.properties as { title?: unknown }).title === 'string';
+  return item.type === 'movie';
 }
 
 function isPerson(item: SearchResult): item is Person {
-  return 'name' in item && typeof item.name === 'string';
+  return item.type === 'person';
 }
 
 export default function SearchPage({ initialPeople, initialMovies }: SearchPageProps) {
@@ -210,6 +205,7 @@ export default function SearchPage({ initialPeople, initialMovies }: SearchPageP
                     ? item.name 
                     : '';
                 const id = item.uid || item._id || String(index);
+                const itemType = isMovie(item) ? 'movies' : 'people';
                 
                 return (
                   <div key={index}>
@@ -217,7 +213,7 @@ export default function SearchPage({ initialPeople, initialMovies }: SearchPageP
                       <h4 className="text-sm sm:text-base font-semibold text-gray-800 break-words flex-1">
                         {title}
                       </h4>
-                      <Link href={`/details/${searchType === 'movies' ? 'movies' : 'people'}/${id}`} className="flex-shrink-0 w-full sm:w-auto">
+                      <Link href={`/details/${itemType}/${id}`} className="flex-shrink-0 w-full sm:w-auto">
                         <Button
                           type="button"
                           className="w-full sm:w-auto"
